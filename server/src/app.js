@@ -1,8 +1,11 @@
 const express = require("express");
 const routes = require("./routes/index");
 
-const app = express();
+const multer = require("multer");
+const forms = multer();
+
 const port = process.env.PORT || 5000;
+
 const mongoURL =
   process.env.MONGO_URL || "mongodb://il-mongo:27017/insight-loom";
 
@@ -16,7 +19,11 @@ mongoose
     console.log(error);
   });
 
+const app = express();
+
 app.use(express.json());
+app.use(forms.array());
+app.use(express.urlencoded({ extended: true }));
 
 app.use("/", routes);
 
