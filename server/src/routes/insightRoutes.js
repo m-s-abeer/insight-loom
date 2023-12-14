@@ -1,12 +1,11 @@
 const express = require("express");
 const router = express.Router();
+const insightController = require("../controllers/insightController");
 
-router.get("/", (req, res) => {
-  res.send("Get global insights");
-});
+router.get("/", insightController.getAllInsights);
 
-router.post("/", (req, res) => {
-  res.send("Post a global insight");
-});
+router.post("/", insightController.createInsight);
+
+router.delete("/:insightId", insightController.deleteInsight);
 
 module.exports = router;
