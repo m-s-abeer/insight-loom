@@ -6,6 +6,8 @@ services:
     container_name: il-server
     ports:
       - "9321:5000"
+    volumes:
+      - ./server/src:/app/server/src
     depends_on:
       - mongo
   client:
