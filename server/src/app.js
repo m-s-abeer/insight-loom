@@ -1,22 +1,30 @@
-const express = require('express');
-const routes = require('./routes/index');
+const express = require("express");
+const routes = require("./routes/index");
 
 const app = express();
-const port = process.env.PORT || 5000; // Use PORT environment variable or default to 5000
+const port = process.env.PORT || 5000;
+const mongoURL =
+  process.env.MONGO_URL || "mongodb://il-mongo:27017/insight-loom";
 
-// Middleware to parse JSON bodies
+const mongoose = require("mongoose");
+
+mongoose
+  .connect(mongoURL)
+  .then(() => console.log("Connected to DB"))
+  .catch((error) => {
+    console.log("Error connecting to DB");
+    console.log(error);
+  });
+
 app.use(express.json());
 
-// Use the routes defined in ./routes/index.js
-app.use('/', routes);
+app.use("/", routes);
 
-// Error handling middleware
-app.use((err, req, res, next) => {
-    console.error(err.stack);
-    res.status(500).send('Something went wrong!');
+app.use((err, req, res) => {
+  console.error(err.stack);
+  res.status(500).send("Something went wrong!");
 });
 
-// Start the server
 app.listen(port, () => {
-    console.log(`Server is running on port ${port}`);
+  console.log(`Server is running on port ${port}`);
 });

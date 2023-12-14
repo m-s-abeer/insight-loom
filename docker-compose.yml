@@ -3,6 +3,7 @@ services:
   server:
     build:
       context: ./server
+    container_name: il-server
     ports:
       - "9321:5000"
     depends_on:
@@ -10,9 +11,11 @@ services:
   client:
     build:
       context: client
+    container_name: il-client
     ports:
       - "3007:3000"
   mongo:
     image: "mongo:7.0.4"
+    container_name: il-mongo
     ports:
       - "27017:27017"
