@@ -10,6 +10,8 @@ router.get("/", insightController.getAllInsights);
 
 router.post("/", insightController.createInsight);
 
+router.get("/:insightId", insightController.getInsightById);
+
 router.delete("/:insightId", insightController.deleteInsight);
 
 router.get("/:insightId/comments", interactionController.getCommentsForInsight);

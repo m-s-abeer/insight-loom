@@ -14,7 +14,11 @@ async function createInsightService(text) {
   const newInsight = new Insight({ text });
   await newInsight.save();
 
-  return newInsight;
+  return {
+    insight: newInsight,
+    reactions: {},
+    userReaction: null,
+  };
 }
 
 async function deleteInsightService(insightId) {
@@ -24,7 +28,7 @@ async function deleteInsightService(insightId) {
 
 async function getAllInsightsWithReactions(userId) {
   try {
-    const insights = await Insight.find();
+    const insights = await Insight.find().sort({ timestamp: -1 });
 
     const insightsWithReactions = await Promise.all(
       insights.map(async (insight) => {
@@ -46,9 +50,37 @@ async function getAllInsightsWithReactions(userId) {
   }
 }
 
+async function getInsightByIdWithReactions(insightId, userId) {
+  try {
+    const insight = await Insight.findById(insightId);
+
+    if (!insight) {
+      return null;
+    }
+
+    const reactionCounts = await getReactionCounts(insight._id);
+    const userReaction = await getUserReaction(insightId, userId);
+
+    const insightWithReactions = {
+      insight,
+      reactions: reactionCounts,
+      userReaction,
+    };
+
+    return insightWithReactions;
+  } catch (error) {
+    console.error(
+      "Error fetching insight by ID with reactions from the database:",
+      error,
+    );
+    throw error; // Rethrow the error to be caught by the controller
+  }
+}
+
 module.exports = {
   getAllInsightsService,
   getAllInsightsWithReactions,
+  getInsightByIdWithReactions,
   createInsightService,
   deleteInsightService,
 };

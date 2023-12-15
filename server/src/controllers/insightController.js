@@ -11,6 +11,25 @@ async function getAllInsights(req, res) {
   }
 }
 
+const getInsightById = async (req, res) => {
+  try {
+    const insightId = req.params.insightId;
+    const insight = await insightServices.getInsightByIdWithReactions(
+      insightId,
+      req.user.id,
+    );
+
+    if (!insight) {
+      return res.status(404).json({ message: "Insight not found" });
+    }
+
+    res.status(200).json({ insight });
+  } catch (error) {
+    console.error("Error fetching insight by ID:", error);
+    res.status(500).json({ message: "Internal Server Error" });
+  }
+};
+
 async function createInsight(req, res) {
   const { text } = req.body;
 
@@ -41,6 +60,7 @@ async function deleteInsight(req, res) {
 
 module.exports = {
   getAllInsights,
+  getInsightById,
   createInsight,
   deleteInsight,
 };
