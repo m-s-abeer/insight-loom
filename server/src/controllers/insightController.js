@@ -2,7 +2,9 @@ const insightServices = require("../services/insightServices");
 
 async function getAllInsights(req, res) {
   try {
-    const allInsights = await insightServices.getAllInsightsService();
+    const allInsights = await insightServices.getAllInsightsWithReactions(
+      req.user.id,
+    );
     res.status(200).json(allInsights);
   } catch (error) {
     res.status(500).json({ error: "Internal Server Error" });

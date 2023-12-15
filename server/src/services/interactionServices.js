@@ -91,10 +91,67 @@ async function reactOnComment(commentId, userId, reactionType) {
   }
 }
 
+async function getReactionCounts(targetId) {
+  const reactionCounts = await Reaction.aggregate([
+    { $match: { targetId } },
+    {
+      $group: {
+        _id: "$reaction",
+        count: { $sum: 1 },
+      },
+    },
+  ]);
+
+  const countsMap = {};
+  reactionCounts.forEach((item) => {
+    countsMap[item._id] = item.count;
+  });
+
+  return countsMap;
+}
+
+async function getUserReaction(targetId, userId) {
+  const hashedUserId = hashUserIdentifier(userId);
+
+  const userReaction = await Reaction.findOne({
+    targetId,
+    userHash: hashedUserId,
+  });
+
+  return userReaction ? userReaction.reaction : null;
+}
+
+async function getCommentsForInsightWithReactions(insightId, userId) {
+  try {
+    const comments = await Comment.find({ insightId });
+
+    const commentsWithReactions = await Promise.all(
+      comments.map(async (comment) => {
+        const reactionCounts = await getReactionCounts(comment._id);
+        const userReaction = await getUserReaction(comment._id, userId);
+
+        return {
+          comment,
+          reactions: reactionCounts,
+          userReaction,
+        };
+      }),
+    );
+
+    return commentsWithReactions;
+  } catch (error) {
+    console.error(error);
+    throw new Error("Failed to get comments with reactions");
+  }
+}
+
 module.exports = {
   createCommentForInsight,
   getCommentsForInsight,
+  getCommentsForInsightWithReactions,
   deleteComment,
   reactOnInsight,
   reactOnComment,
+  getReactionCounts,
+  getUserReaction,
 };

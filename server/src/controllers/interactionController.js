@@ -21,7 +21,11 @@ async function getCommentsForInsight(req, res) {
   try {
     const { insightId } = req.params;
 
-    const comments = await interactionServices.getCommentsForInsight(insightId);
+    const comments =
+      await interactionServices.getCommentsForInsightWithReactions(
+        insightId,
+        req.user.id,
+      );
 
     return res.status(200).json(comments);
   } catch (error) {
