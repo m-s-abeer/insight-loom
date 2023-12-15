@@ -5,7 +5,7 @@ services:
       context: ./server
     container_name: il-server
     ports:
-      - "9321:5000"
+      - "5000:5000"
     volumes:
       - ./server/src:/app/server/src
       - ./server/package.json:/app/server/package.json
@@ -17,7 +17,11 @@ services:
       context: client
     container_name: il-client
     ports:
-      - "3007:3000"
+      - "3000:3000"
+    volumes:
+      - ./client/src:/app/client/src
+      - ./client/package.json:/app/client/package.json
+      - ./client/yarn.lock:/app/client/yarn.lock
   mongo:
     image: "mongo:7.0.4"
     container_name: il-mongo
