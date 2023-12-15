@@ -3,6 +3,8 @@ import { AuthProvider } from "./components/AuthProvider";
 import "./App.css";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Login from "./components/Login";
+import Logout from "./components/Logout";
+import Register from "./components/Register";
 
 function App() {
   return (
@@ -14,7 +16,8 @@ function App() {
               <Route path="" element={<AppLayout />}>
                 {/*<Route path='/' element={<Homepage />} />*/}
                 <Route path="/login" element={<Login />} />
-                {/*<Route path="/logout" element={<Logout />} />*/}
+                <Route path="/register" element={<Register />} />
+                <Route path="/logout" element={<Logout />} />
               </Route>
             </Routes>
           </BrowserRouter>

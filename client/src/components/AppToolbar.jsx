@@ -1,6 +1,7 @@
 import { Fragment } from "react";
 import { Disclosure, Menu, Transition } from "@headlessui/react";
 import { BellIcon, XMarkIcon } from "@heroicons/react/24/outline";
+import { useAuth } from "./AuthProvider";
 
 const user = {
   name: "Anonymous User",
@@ -10,15 +11,16 @@ const user = {
 };
 
 const navigation = [
-  { name: "Dashboard", href: "/", current: false },
   { name: "Login", href: "/login", current: false },
   { name: "Register", href: "/register", current: false },
 ];
 
+const loggedInNavigation = [{ name: "Dashboard", href: "/", current: false }];
+
 const userNavigation = [
   { name: "Your Profile", href: "#" },
   { name: "Settings", href: "#" },
-  { name: "Sign out", href: "#" },
+  { name: "Sign out", href: "/logout" },
 ];
 
 function classNames(...classes) {
@@ -26,6 +28,9 @@ function classNames(...classes) {
 }
 
 export function AppToolbar() {
+  const { token } = useAuth();
+  const isLoggedIn = token !== null;
+
   return (
     <>
       <div className="min-h-full">
@@ -43,21 +48,23 @@ export function AppToolbar() {
                     />
                     <div className="hidden md:block">
                       <div className="ml-10 flex items-baseline space-x-4">
-                        {navigation.map((item) => (
-                          <a
-                            key={item.name}
-                            href={item.href}
-                            className={classNames(
-                              item.current
-                                ? "bg-gray-900 text-white"
-                                : "text-gray-300 hover:bg-gray-700 hover:text-white",
-                              "rounded-md px-3 py-2 text-sm font-medium",
-                            )}
-                            aria-current={item.current ? "page" : undefined}
-                          >
-                            {item.name}
-                          </a>
-                        ))}
+                        {(isLoggedIn ? loggedInNavigation : navigation).map(
+                          (item) => (
+                            <a
+                              key={item.name}
+                              href={item.href}
+                              className={classNames(
+                                item.current
+                                  ? "bg-gray-900 text-white"
+                                  : "text-gray-300 hover:bg-gray-700 hover:text-white",
+                                "rounded-md px-3 py-2 text-sm font-medium",
+                              )}
+                              aria-current={item.current ? "page" : undefined}
+                            >
+                              {item.name}
+                            </a>
+                          ),
+                        )}
                       </div>
                     </div>
                   </div>
