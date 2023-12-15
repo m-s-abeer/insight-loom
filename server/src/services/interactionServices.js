@@ -1,5 +1,7 @@
 const Comment = require("../models/comment");
 const Insight = require("../models/insight");
+const Reaction = require("../models/reaction");
+const { hashUserIdentifier } = require("./utils");
 
 async function createCommentForInsight(text, insightId) {
   try {
@@ -37,8 +39,62 @@ async function deleteComment(commentId) {
   return deletedComment;
 }
 
+async function reactOnInsight(insightId, userId, reactionType) {
+  const hashedUserId = hashUserIdentifier(userId);
+
+  const existingReaction = await Reaction.findOne({
+    targetId: insightId,
+    userHash: hashedUserId,
+  });
+
+  if (existingReaction) {
+    if (existingReaction.reaction === reactionType) {
+      await Reaction.deleteOne({ targetId: insightId, userHash: hashedUserId });
+    } else {
+      await Reaction.updateOne(
+        { targetId: insightId, userHash: hashedUserId },
+        { $set: { reaction: reactionType } },
+      );
+    }
+  } else {
+    await Reaction.create({
+      targetId: insightId,
+      userHash: hashedUserId,
+      reaction: reactionType,
+    });
+  }
+}
+
+async function reactOnComment(commentId, userId, reactionType) {
+  const hashedUserId = hashUserIdentifier(userId);
+
+  const existingReaction = await Reaction.findOne({
+    targetId: commentId,
+    userHash: hashedUserId,
+  });
+
+  if (existingReaction) {
+    if (existingReaction.reaction === reactionType) {
+      await Reaction.deleteOne({ targetId: commentId, userHash: hashedUserId });
+    } else {
+      await Reaction.updateOne(
+        { targetId: commentId, userHash: hashedUserId },
+        { $set: { reaction: reactionType } },
+      );
+    }
+  } else {
+    await Reaction.create({
+      targetId: commentId,
+      userHash: hashedUserId,
+      reaction: reactionType,
+    });
+  }
+}
+
 module.exports = {
   createCommentForInsight,
   getCommentsForInsight,
   deleteComment,
+  reactOnInsight,
+  reactOnComment,
 };

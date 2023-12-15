@@ -46,8 +46,40 @@ async function deleteComment(req, res) {
   }
 }
 
+async function reactOnInsight(req, res) {
+  try {
+    const userId = req.user.id;
+    const { insightId } = req.params;
+    const { reactionType } = req.body;
+
+    await interactionServices.reactOnInsight(insightId, userId, reactionType);
+
+    res.status(200).json({ message: "Reaction saved successfully" });
+  } catch (error) {
+    console.error(error.message);
+    res.status(400).json({ error: error.message || "Bad Request" });
+  }
+}
+
+async function reactOnComment(req, res) {
+  try {
+    const userId = req.user.id;
+    const { commentId } = req.params;
+    const { reactionType } = req.body;
+
+    await interactionServices.reactOnComment(commentId, userId, reactionType);
+
+    res.status(200).json({ message: "Reaction saved successfully" });
+  } catch (error) {
+    console.error(error.message);
+    res.status(400).json({ error: error.message || "Bad Request" });
+  }
+}
+
 module.exports = {
   createCommentForInsight,
   getCommentsForInsight,
   deleteComment,
+  reactOnInsight,
+  reactOnComment,
 };

@@ -19,4 +19,6 @@ router.post(
   interactionController.createCommentForInsight,
 );
 
+router.post("/:insightId/react", interactionController.reactOnInsight);
+
 module.exports = router;
