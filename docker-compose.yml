@@ -8,6 +8,8 @@ services:
       - "9321:5000"
     volumes:
       - ./server/src:/app/server/src
+      - ./server/package.json:/app/server/package.json
+      - ./server/yarn.lock:/app/server/yarn.lock
     depends_on:
       - mongo
   client:
