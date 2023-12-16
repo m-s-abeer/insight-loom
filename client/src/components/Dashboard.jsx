@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from "react";
 import serverApi from "../serverApi";
+import { useAuth } from "./AuthProvider";
 import Insight from "./Insight";
 
 export default function Dashboard() {
   const [newInsight, setNewInsight] = useState("");
-
   const [insights, setInsights] = useState([]);
+  const { token } = useAuth();
 
   useEffect(() => {
     const fetchInsights = async () => {
@@ -34,6 +35,19 @@ export default function Dashboard() {
       console.error("Error sharing insight:", error);
     }
   };
+
+  if (!token) {
+    return (
+      <div
+        className="flex justify-center items-center h-screen"
+        style={{ height: "80vh" }}
+      >
+        <div className="text-7xl font-bold text-center text-gray-600 font-serif">
+          Welcome to Insight Loom
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="max-w-7xl mx-auto p-6">

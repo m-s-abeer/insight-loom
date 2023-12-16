@@ -1,7 +1,12 @@
 import moment from "moment";
-import React, { useState } from "react";
-import { ChevronUpIcon, ChevronDownIcon } from "@heroicons/react/24/outline";
+import React, { useState, useEffect } from "react";
+import {
+  ChevronUpIcon,
+  ChevronDownIcon,
+  PaperAirplaneIcon,
+} from "@heroicons/react/24/outline";
 import serverApi from "../serverApi";
+import Comment from "./Comment";
 
 export default function Insight({ data }) {
   const { insight, reactions, userReaction } = data;
@@ -10,7 +15,37 @@ export default function Insight({ data }) {
   const [downvotes, setDownvotes] = useState(reactions?.downvote || 0);
   const [userReactionState, setUserReactionState] = useState(userReaction);
 
-  console.log(upvotes);
+  const [comments, setComments] = useState([]);
+  const [newComment, setNewComment] = useState("");
+  const [isExpanded, setIsExpanded] = useState(false);
+
+  useEffect(() => {
+    const fetchComments = async () => {
+      try {
+        const response = await serverApi.get(`/insights/${_id}/comments`);
+        setComments(response.data);
+      } catch (error) {
+        console.error("Error fetching comments:", error);
+      }
+    };
+
+    if (isExpanded) {
+      fetchComments();
+    }
+  }, [_id, isExpanded]);
+
+  const handleAddComment = async () => {
+    try {
+      await serverApi.post(`/insights/${_id}/comments`, { text: newComment });
+
+      const response = await serverApi.get(`/insights/${_id}/comments`);
+      setComments(response.data);
+
+      setNewComment("");
+    } catch (error) {
+      console.error("Error adding comment:", error);
+    }
+  };
 
   const handleReactOnInsight = async (insightId, reactionType) => {
     try {
@@ -68,6 +103,58 @@ export default function Insight({ data }) {
           <span>{`Downvote (${downvotes})`}</span>
         </button>
       </div>
+
+      {/* Add Comment */}
+      <div className="mt-4 flex items-center">
+        <textarea
+          value={newComment}
+          onChange={(e) => setNewComment(e.target.value)}
+          placeholder="Add a comment..."
+          className="flex-grow p-3 border border-gray-300 rounded-md focus:outline-none focus:ring focus:border-indigo-500"
+        ></textarea>
+        <button
+          onClick={handleAddComment}
+          className="ml-2 px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-500 focus:outline-none focus:ring focus:border-indigo-700"
+        >
+          <PaperAirplaneIcon className="h-8 w-4" />
+        </button>
+      </div>
+
+      {/* Expand Comments */}
+      <div className="mt-3">
+        <div
+          className={`w-full flex items-center py-2 rounded-md cursor-pointer text-center text-white ${
+            isExpanded
+              ? "bg-indigo-600"
+              : "bg-gray-200 hover:bg-gray-300 text-indigo-700"
+          }`}
+          onClick={() => setIsExpanded(!isExpanded)}
+        >
+          {isExpanded ? (
+            <ChevronUpIcon className="h-4 w-4" />
+          ) : (
+            <ChevronDownIcon className="h-4 w-4" />
+          )}
+          <span className="text-xs ml-1">
+            {isExpanded ? "Collapse Comments" : "View Comments"}
+          </span>
+        </div>
+      </div>
+
+      {/* Comments Section */}
+      {isExpanded && (
+        <div className="mt-4 space-y-2">
+          {comments.length === 0 ? (
+            <p className="text-gray-500">
+              There's no comments on this insight yet.
+            </p>
+          ) : (
+            comments.map((comment) => (
+              <Comment key={comment._id} data={comment} />
+            ))
+          )}
+        </div>
+      )}
     </div>
   );
 }
