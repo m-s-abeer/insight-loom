@@ -13,6 +13,6 @@ router.get("/status", (req, res) => {
 router.use("/auth", authRoutes);
 router.use("/channels", channelRoutes);
 router.use("/insights", insightRoutes);
-router.use("/", interactionRoutes);
+router.use("/interactions", interactionRoutes);
 
 module.exports = router;

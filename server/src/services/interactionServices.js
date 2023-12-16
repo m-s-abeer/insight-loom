@@ -145,9 +145,37 @@ async function getCommentsForInsightWithReactions(insightId, userId) {
   }
 }
 
+async function getCommentByIdWithReactions(commentId, userId) {
+  try {
+    const comment = await Comment.findById(commentId);
+
+    if (!comment) {
+      return null;
+    }
+
+    const reactionCounts = await getReactionCounts(comment._id);
+    const userReaction = await getUserReaction(commentId, userId);
+
+    const commentWithReactions = {
+      comment,
+      reactions: reactionCounts,
+      userReaction,
+    };
+
+    return commentWithReactions;
+  } catch (error) {
+    console.error(
+      "Error fetching comment by ID with reactions from the database:",
+      error,
+    );
+    throw error;
+  }
+}
+
 module.exports = {
   createCommentForInsight,
   getCommentsForInsight,
+  getCommentByIdWithReactions,
   getCommentsForInsightWithReactions,
   deleteComment,
   reactOnInsight,

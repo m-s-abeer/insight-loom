@@ -12,7 +12,7 @@ router.post("/", insightController.createInsight);
 
 router.get("/:insightId", insightController.getInsightById);
 
-router.delete("/:insightId", insightController.deleteInsight);
+// router.delete("/:insightId", insightController.deleteInsight); // TODO: Implement when storing userHash in insight so it's verifiable
 
 router.get("/:insightId/comments", interactionController.getCommentsForInsight);
 

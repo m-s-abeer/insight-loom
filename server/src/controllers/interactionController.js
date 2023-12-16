@@ -80,9 +80,29 @@ async function reactOnComment(req, res) {
   }
 }
 
+async function getCommentById(req, res) {
+  try {
+    const commentId = req.params.commentId;
+    const comment = await interactionServices.getCommentByIdWithReactions(
+      commentId,
+      req.user.id,
+    );
+
+    if (!comment) {
+      return res.status(404).json({ message: "Comment not found" });
+    }
+
+    res.status(200).json({ comment });
+  } catch (error) {
+    console.error("Error fetching comment by ID:", error);
+    res.status(500).json({ message: "Internal Server Error" });
+  }
+}
+
 module.exports = {
   createCommentForInsight,
   getCommentsForInsight,
+  getCommentById,
   deleteComment,
   reactOnInsight,
   reactOnComment,
