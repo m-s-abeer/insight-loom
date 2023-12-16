@@ -36,6 +36,20 @@ export default function Dashboard() {
     }
   };
 
+  const handleInsightUpdate = async (insightId, updatedInsight) => {
+    setInsights((prevInsights) => {
+      const updatedInsights = prevInsights.map((insight) => {
+        if (insight.insight._id === insightId) {
+          return updatedInsight;
+        }
+
+        return insight;
+      });
+
+      return updatedInsights;
+    });
+  };
+
   if (!token) {
     return (
       <div
@@ -70,7 +84,11 @@ export default function Dashboard() {
       {/* List of Insights */}
       <div>
         {insights.map((insight) => (
-          <Insight key={insight._id} data={insight} />
+          <Insight
+            key={insight._id}
+            data={insight}
+            onInsightUpdate={handleInsightUpdate}
+          />
         ))}
       </div>
     </div>

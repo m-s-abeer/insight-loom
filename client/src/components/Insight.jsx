@@ -8,12 +8,11 @@ import {
 import serverApi from "../serverApi";
 import Comment from "./Comment";
 
-export default function Insight({ data }) {
+export default function Insight({ data, onInsightUpdate }) {
   const { insight, reactions, userReaction } = data;
   const { _id, text, timestamp } = insight;
-  const [upvotes, setUpvotes] = useState(reactions?.upvote || 0);
-  const [downvotes, setDownvotes] = useState(reactions?.downvote || 0);
-  const [userReactionState, setUserReactionState] = useState(userReaction);
+  const upvotes = reactions?.upvote || 0;
+  const downvotes = reactions?.downvote || 0;
 
   const [comments, setComments] = useState([]);
   const [newComment, setNewComment] = useState("");
@@ -56,9 +55,7 @@ export default function Insight({ data }) {
       const response = await serverApi.get(`/insights/${insightId}`);
       const updatedInsight = response.data.insight;
 
-      setUpvotes(updatedInsight.reactions.upvote || 0);
-      setDownvotes(updatedInsight.reactions.downvote || 0);
-      setUserReactionState(updatedInsight.userReaction);
+      onInsightUpdate(_id, updatedInsight);
     } catch (error) {
       console.error("Reaction failed:", error);
     }
@@ -82,7 +79,7 @@ export default function Insight({ data }) {
       <div className="flex items-center space-x-4">
         <button
           className={`flex items-center text-gray-500 space-x-1 px-3 py-1 rounded-full focus:outline-none ${
-            userReactionState === "upvote"
+            userReaction === "upvote"
               ? "text-white bg-indigo-500 hover:bg-indigo-400"
               : "active:bg-indigo-700 hover:text-indigo-500"
           }`}
@@ -93,7 +90,7 @@ export default function Insight({ data }) {
         </button>
         <button
           className={`flex items-center text-gray-500 space-x-1 px-3 py-1 rounded-full focus:outline-none ${
-            userReactionState === "downvote"
+            userReaction === "downvote"
               ? "text-white bg-red-500 hover:bg-red-400"
               : "active:bg-red-700 hover:text-red-500"
           }`}
